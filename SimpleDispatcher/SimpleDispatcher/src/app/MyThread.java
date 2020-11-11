@@ -248,6 +248,11 @@ final class Dispatcher extends Thread{
 public final class MyThread {
     public static void main(String[] args) throws InterruptedException {
 
+        //Create shutDownThread
+        final ShutDownThread shutDownThread = new ShutDownThread();
+        //Thread will shut down console program by entering CTRL + C
+        Runtime.getRuntime().addShutdownHook(shutDownThread);
+
         System.out.println("Once user has enter the number of dispatcher, they can enter CTRL + C to terminate the program");
 
         final int numberOfDispatcher = inquireNumberOfDispatcher();
@@ -276,10 +281,6 @@ public final class MyThread {
             dispatcherThread[i] = new Dispatcher(SharedResources.getResource(i).getBag(), SharedResources.getResource(i).getSemaphoreForBag(), SharedResources.getResource(i).getUnLimitedBag());
             dispatcherThread[i].start();
         }
-        //Create shutDownThread
-        final ShutDownThread shutDownThread = new ShutDownThread();
-        //Thread will shut down console program by entering CTRL + C
-        Runtime.getRuntime().addShutdownHook(shutDownThread);
     }
 
     //User defined cancel handler, terminate program
@@ -289,7 +290,7 @@ public final class MyThread {
         @Override
         public void run() {
             System.out.println("\nPerforming shutdown...");
-            System.out.println("All threads are shutdown");
+            System.out.println("Programs are shutdown");
         }
     }
 
