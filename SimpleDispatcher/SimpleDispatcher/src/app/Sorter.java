@@ -20,11 +20,11 @@ public final class Sorter extends Thread {
             //Remove the first item from buffer
             final ItemType item = this.sr.getItemBuffer().poll();
             System.out.println("Sorter: Waiting Item...");
-            final String itemName = item.getItemName();
+            final char itemName = item.getItemName();
             for (int i = 0; i < this.numberOfDispatcher; i++) {
                 //ascii code for alphabet from A up to N alphabets
-                final String item_NAME = Character.toString((char)(i + 65));
-                if (item_NAME.equals(itemName)) {
+                final char item_NAME = (char)(i + 65);
+                if (item_NAME == itemName) {
                     this.addToBag(this.sr, this.dispatchers[i], item);
                     break;
                 }
@@ -51,7 +51,7 @@ public final class Sorter extends Thread {
 
             System.out.println("Sorter: Item " + item.getItemName() + "(" + dispatcher.getItemCounter() + ")");
 
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             //If any thread has interrupted the executing Sorter thread,
             //The interrupted status of the Sorter thread is cleared when this exception is thrown
             System.out.println(e);
@@ -70,7 +70,7 @@ public final class Sorter extends Thread {
                 //Release a permit from semBuffer semaphore
                 this.sr.getSemBuffer().release();
 
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
             //If any thread has interrupted the executing Sorter thread,
             //The interrupted status of the Sorter thread is cleared when this exception is thrown
                 System.out.println(e);

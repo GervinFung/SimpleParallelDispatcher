@@ -15,11 +15,10 @@ public final class MyThread extends Thread{
         Runtime.getRuntime().addShutdownHook(thread);
 
         final int numberOfDispatcher = userInput.inquireNumberOfDispatcher();
-        final String allItemName = userInput.getAlphabet(numberOfDispatcher);
 
         final Dispatcher[] dispatcherThread = new Dispatcher[numberOfDispatcher];
         final Sorter sortItemThread = new Sorter(sr, dispatcherThread);
-        final Item arrivalItemThread = new Item(sr, allItemName);
+        final Item arrivalItemThread = new Item(sr, numberOfDispatcher);
 
         sortItemThread.start();
         arrivalItemThread.start();
@@ -45,20 +44,12 @@ public final class MyThread extends Thread{
     }
 
     private final class Input {
-        private String getAlphabet(final int n) {
-            String x = "";
-            //loop from 0 to N to get Alphabet from 65(A) to N+65 Alphabet
-            for (int i = 0; i < n; i++) {
-                x += Character.toString((char)(i + 65));
-            }
-            return x;
-        }
 
         private boolean tryParseInt(final String input) {
             try {
                 final int integer = Integer.parseInt(input);
                 return integer > 0 && integer <= 26;
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 return false;
             }
         }

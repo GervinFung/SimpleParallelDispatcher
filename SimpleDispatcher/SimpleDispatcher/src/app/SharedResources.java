@@ -13,7 +13,6 @@ public final class SharedResources {
     //so only 1 thread can access buffer at a time
     private final Semaphore semAccessBuffer = new Semaphore(1);
 
-
     protected Queue<ItemType> getItemBuffer () {
         return this.itemBuffer;
     }

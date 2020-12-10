@@ -33,7 +33,7 @@ public final class Dispatcher extends Thread{
         while (true) {
             try {
                 if ("10".equals(Integer.toString(this.counter))) {
-                    final String bagName = this.bag[0].getItemName();
+                    final char bagName = this.bag[0].getItemName();
                     this.unlimitedBag.add(this.bag);
                     System.out.println("\nBag " + bagName + "(" + this.unlimitedBag.size() + ") is full");
                     System.out.println("Dispatcher " + bagName +  ": Moving Bag " + bagName + "(" + this.unlimitedBag.size() + ") to conveyor...");
@@ -42,7 +42,7 @@ public final class Dispatcher extends Thread{
                     System.out.println("Bag " + bagName + "(" + this.unlimitedBag.size() + ") is successfully dispatched");
                     Dispatcher.sleep(1000);
                 }
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 //If any thread has interrupted the executing Dispatcher thread,
                 //The interrupted status of the Dispatcher thread is cleared when this exception is thrown
                 System.out.println(e);

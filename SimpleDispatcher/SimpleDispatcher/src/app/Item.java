@@ -1,22 +1,14 @@
 package app;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class Item extends Thread {
-
-    private final Random randomNumber;
-    private final String allItemName;
+    private final int itemNameRange;
     private final SharedResources sr;
 
-    public Item(final SharedResources sr, final String allItemName) {
+    public Item(final SharedResources sr, final int itemNameRange) {
         this.sr = sr;
-        this.allItemName = allItemName;
-        this.randomNumber = new Random();
-    }
-
-    private String generateItem() {
-        final char c = this.allItemName.toCharArray()[this.randomNumber.nextInt(this.allItemName.toCharArray().length)];
-        return Character.toString(c);
+        this.itemNameRange = itemNameRange;
     }
 
     private void storeInBuffer() {
@@ -27,7 +19,7 @@ public final class Item extends Thread {
                 //Acquire a permit from semAccessBuffer semaphore
                 this.sr.getSemAccessBuffer().acquire();
 
-                final String itemName = generateItem();
+                final char itemName = (char)(ThreadLocalRandom.current().nextInt(65, 65 + itemNameRange));
 
                 //Add item into buffer
                 this.sr.getItemBuffer().add(new ItemType(itemName));
@@ -38,7 +30,7 @@ public final class Item extends Thread {
 
                 Item.sleep(1000);
 
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 //If any thread has interrupted the executing Item thread,
                 //The interrupted status of the Item thread is cleared when this exception is thrown
                 System.out.println(e);
@@ -51,4 +43,3 @@ public final class Item extends Thread {
         this.storeInBuffer();
     }
 }
-
