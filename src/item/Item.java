@@ -1,8 +1,14 @@
-package app;
+package item;
 
+import abstractProcess.IRun;
+import sharedResources.SharedResources;
+import util.RunUtils;
+
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
-public final class Item extends Thread {
+public final class Item implements IRun {
+
     private final int itemNameRange;
     private final SharedResources sr;
 
@@ -15,31 +21,31 @@ public final class Item extends Thread {
         while (true) {
             try {
                 //Acquire a permit from semBuffer semaphore
-                this.sr.getSemBuffer().acquire();
+                this.sr.acquireSemBuffer();
                 //Acquire a permit from semAccessBuffer semaphore
-                this.sr.getSemAccessBuffer().acquire();
+                this.sr.acquireSemAccessBuffer();
 
-                final char itemName = (char)(ThreadLocalRandom.current().nextInt(65, 65 + itemNameRange));
+                final char itemName = (char)(ThreadLocalRandom.current().nextInt(RunUtils.MAX_ALPHABET_RANGE, RunUtils.MAX_ALPHABET_RANGE + itemNameRange));
 
                 //Add item into buffer
-                this.sr.getItemBuffer().add(new ItemType(itemName));
+                this.sr.addItemType(itemName);
                 System.out.println("\nArrival: Item " + itemName);
 
                 //Release a permit from semAccessBuffer semaphore
-                this.sr.getSemAccessBuffer().release();
+                this.sr.releaseSemAccessBuffer();
 
-                Item.sleep(1000);
+                Thread.sleep(RunUtils.DELAY);
 
             } catch (final InterruptedException e) {
                 //If any thread has interrupted the executing Item thread,
                 //The interrupted status of the Item thread is cleared when this exception is thrown
-                System.out.println(e);
+                e.printStackTrace();
             }
         }
     }
 
     @Override
-    public void run() {
-        this.storeInBuffer();
+    public void start() {
+        Executors.newSingleThreadScheduledExecutor().execute(this::storeInBuffer);
     }
 }
