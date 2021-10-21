@@ -2,7 +2,6 @@ package dispatch;
 
 import abstractProcess.IRun;
 import item.ItemType;
-import sharedResources.SharedResources;
 import util.RunUtils;
 
 import java.util.Arrays;
@@ -11,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import java.text.MessageFormat;
 
 public final class Dispatcher implements IRun {
 
@@ -50,16 +51,16 @@ public final class Dispatcher implements IRun {
         while (true) {
             try {
                 if (RunUtils.MAX_NUM == this.counter.get()) {
-                    final char bagName = this.bag.get(0).getItemName();
+                    final char bagName = this.bag.get(0).itemName();
                     this.unlimitedBag.add(this.bag);
 
-                    System.out.println("\nBag " + bagName + "(" + this.unlimitedBag.size() + ") is full");
-                    System.out.println("Dispatcher " + bagName +  ": Moving Bag " + bagName + "(" + this.unlimitedBag.size() + ") to conveyor...");
+                    System.out.println(MessageFormat.format("\nBag {0} ({1}) is full", bagName, this.unlimitedBag.size()));
+                    System.out.println(MessageFormat.format("Dispatcher {0}: Moving Bag {0} ({1}) to conveyor...", bagName, this.unlimitedBag.size()));
 
                     this.counter.set(COUNTER_INITIAL_VALUE);
                     this.semBag.release(RunUtils.MAX_NUM);
 
-                    System.out.println("Bag " + bagName + "(" + this.unlimitedBag.size() + ") is successfully dispatched");
+                    System.out.println(MessageFormat.format("Bag {0} ({1}) is successfully dispatched", bagName, this.unlimitedBag.size()));
 
                     Thread.sleep(RunUtils.DELAY);
                 }
@@ -69,10 +70,6 @@ public final class Dispatcher implements IRun {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static void startAllDispatcher(final List<Dispatcher> dispatcherThread) {
-        dispatcherThread.forEach(Dispatcher::start);
     }
 
     @Override

@@ -4,35 +4,29 @@ import abstractProcess.IRun;
 import sharedResources.SharedResources;
 import util.RunUtils;
 
+import java.text.MessageFormat;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
-public final class Item implements IRun {
-
-    private final int itemNameRange;
-    private final SharedResources sr;
-
-    public Item(final SharedResources sr, final int itemNameRange) {
-        this.sr = sr;
-        this.itemNameRange = itemNameRange;
-    }
+public final record Item(SharedResources sharedResources, int itemNameRange) implements IRun {
 
     private void storeInBuffer() {
         while (true) {
             try {
                 //Acquire a permit from semBuffer semaphore
-                this.sr.acquireSemBuffer();
+                this.sharedResources.acquireSemBuffer();
                 //Acquire a permit from semAccessBuffer semaphore
-                this.sr.acquireSemAccessBuffer();
+                this.sharedResources.acquireSemAccessBuffer();
 
-                final char itemName = (char)(ThreadLocalRandom.current().nextInt(RunUtils.MAX_ALPHABET_RANGE, RunUtils.MAX_ALPHABET_RANGE + itemNameRange));
+                final char itemName = (char) (ThreadLocalRandom.current().nextInt(RunUtils.MAX_ALPHABET_RANGE, RunUtils.MAX_ALPHABET_RANGE + itemNameRange));
 
                 //Add item into buffer
-                this.sr.addItemType(itemName);
-                System.out.println("\nArrival: Item " + itemName);
+                this.sharedResources.addItemType(itemName);
+
+                System.out.println(MessageFormat.format("\nArrival: Item {0}", itemName));
 
                 //Release a permit from semAccessBuffer semaphore
-                this.sr.releaseSemAccessBuffer();
+                this.sharedResources.releaseSemAccessBuffer();
 
                 Thread.sleep(RunUtils.DELAY);
 

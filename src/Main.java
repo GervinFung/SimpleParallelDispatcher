@@ -11,15 +11,14 @@ import java.util.regex.Pattern;
 
 public final class Main {
 
-    private final List<Dispatcher> dispatcherList;
     private final Sorter sorter;
     private final Item item;
 
     private Main (final int numberOfDispatcher) {
-        final SharedResources sr = new SharedResources();
-        this.dispatcherList = this.createDispatchers(numberOfDispatcher);
-        this.sorter = new Sorter(sr, dispatcherList);
-        this.item = new Item(sr, numberOfDispatcher);
+        final SharedResources sharedResources = new SharedResources();
+        final List<Dispatcher> dispatcherList = this.createDispatchers(numberOfDispatcher);
+        this.sorter = new Sorter(sharedResources, dispatcherList);
+        this.item = new Item(sharedResources, numberOfDispatcher);
     }
 
     public static void main(final String[] args){
@@ -37,7 +36,6 @@ public final class Main {
     private void startMain() {
         this.sorter.start();
         this.item.start();
-        Dispatcher.startAllDispatcher(this.dispatcherList);
     }
 
     private final static class Input {

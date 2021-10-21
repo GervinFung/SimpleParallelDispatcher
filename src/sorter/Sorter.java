@@ -9,31 +9,25 @@ import util.RunUtils;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public final class Sorter implements IRun {
+import java.text.MessageFormat;
 
-    private final SharedResources sr;
-    private final List<Dispatcher> dispatchers;
-
-    public Sorter(final SharedResources sr, final List<Dispatcher> dispatchers) {
-        this.sr = sr;
-        this.dispatchers = dispatchers;
-    }
+public final record Sorter(SharedResources sharedResources, List<Dispatcher> dispatchers) implements IRun {
 
     private void sortItem() {
         //Prevent sorter from taking empty buffer
-        if (this.sr.isItemBufferEmpty()) {
+        if (this.sharedResources.isItemBufferEmpty()) {
             return;
         }
 
-        final ItemType item = this.sr.pollItemType();
+        final ItemType item = this.sharedResources.pollItemType();
         System.out.println("Sorter: Waiting Item...");
-        final char itemName = item.getItemName();
+        final char itemName = item.itemName();
 
         for (final Dispatcher dispatcher : this.dispatchers) {
             //ascii code for alphabet from A up to N alphabets
-            final char item_NAME = (char)(dispatcher.getAsciiAlphabetInt() + RunUtils.MAX_ALPHABET_RANGE);
-            if (item_NAME == itemName) {
-                this.addToBag(this.sr, this.dispatchers.get(dispatcher.getAsciiAlphabetInt()), item);
+            final char itemNameReceived = (char) (dispatcher.getAsciiAlphabetInt() + RunUtils.MAX_ALPHABET_RANGE);
+            if (itemNameReceived == itemName) {
+                this.addToBag(this.sharedResources, this.dispatchers.get(dispatcher.getAsciiAlphabetInt()), item);
                 return;
             }
         }
@@ -54,7 +48,7 @@ public final class Sorter implements IRun {
             //Release a permit from parameter semAccessBuffer
             sr.releaseSemAccessBuffer();
 
-            System.out.println("Sorter: Item " + item.getItemName() + "(" + dispatcher.getItemCounter() + ")");
+            System.out.println(MessageFormat.format("Sorter: Item {0} ({1})", item.itemName(), dispatcher.getItemCounter()));
 
         } catch (final InterruptedException e) {
             //If any thread has interrupted the executing Sorter thread,
@@ -64,6 +58,7 @@ public final class Sorter implements IRun {
     }
 
     private void sortToBag() {
+        this.dispatchers.forEach(Dispatcher::start);
         while (true) {
             try {
                 //Sort the item to bag
@@ -73,7 +68,7 @@ public final class Sorter implements IRun {
                 Thread.sleep(RunUtils.DELAY);
 
                 //Release a permit from semBuffer semaphore
-                this.sr.releaseSemBuffer();
+                this.sharedResources.releaseSemBuffer();
 
             } catch (final InterruptedException e) {
                 //If any thread has interrupted the executing Sorter thread,
