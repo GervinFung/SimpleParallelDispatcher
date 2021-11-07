@@ -3,11 +3,10 @@ import item.Item;
 import sharedResources.SharedResources;
 import sorter.Sorter;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 public final class Main {
 
@@ -26,11 +25,7 @@ public final class Main {
     }
 
     private List<Dispatcher> createDispatchers(final int numberOfDispatcher) {
-        final List<Dispatcher> dispatchers = new ArrayList<>();
-        for (int i = 0; i < numberOfDispatcher; i++) {
-            dispatchers.add(new Dispatcher(i));
-        }
-        return Collections.unmodifiableList(dispatchers);
+        return IntStream.range(0, numberOfDispatcher).boxed().map(Dispatcher::new).toList();
     }
 
     private void startMain() {
